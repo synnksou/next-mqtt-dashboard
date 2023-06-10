@@ -1,7 +1,4 @@
-import Link from "next/link"
-
-import { siteConfig } from "@/config/site"
-import { buttonVariants } from "@/components/ui/button"
+import Dashboard from "@/components/dashboard"
 
 export default function IndexPage() {
   return (
@@ -11,7 +8,9 @@ export default function IndexPage() {
           Dashboard Cinema
         </h1>
       </div>
-      <div className="flex gap-4"></div>
+      <div className="flex gap-4">
+        <Dashboard />
+      </div>
     </section>
   )
 }
