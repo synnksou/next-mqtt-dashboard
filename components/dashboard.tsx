@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react"
 
 import DashboardPage from "./dashboard-page"
@@ -44,26 +46,6 @@ const Dashboard = () => {
           value={tabName}
         />
       ))}
-      {/* {data?.map(({ celcius, airQuality, countPerson, tabName }, index) => (
-        <>
-          <TabsList>
-            <TabsTrigger
-              key={tabName}
-              value={tabName}
-              className="text-sm font-medium"
-            >
-              {tabName}
-            </TabsTrigger>
-          </TabsList>
-          <DashboardPage
-            key={index}
-            celcius={celcius}
-            airQuality={airQuality}
-            countPerson={countPerson}
-            index={index}
-          />
-        </>
-      ))} */}
     </Tabs>
   )
 }

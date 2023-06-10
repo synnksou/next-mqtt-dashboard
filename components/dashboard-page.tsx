@@ -2,6 +2,8 @@
 /* eslint-disable react/no-unescaped-entities */
 import { AirVentIcon, DollarSign, Thermometer, User, Wind } from "lucide-react"
 
+import { DashboardItem } from "@/types/index"
+
 import {
   Card,
   CardContent,
@@ -17,13 +19,7 @@ const DashboardPage = ({
   countPerson,
   index,
   value,
-}: {
-  celcius: number
-  airQuality: number
-  countPerson: number
-  index: number
-  value: string
-}) => {
+}: DashboardItem) => {
   return (
     <TabsContent value={value} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
