@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: "Next.js",
+  name: "Mqtt Dashboard",
   description: "Dashboard with Mqtt and Next.js",
   mainNav: [
     {

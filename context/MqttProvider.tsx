@@ -5,6 +5,7 @@ import { connectionToMqtt } from "@/services"
 import { BaseLayoutProps } from "@/types"
 import { useEffectOnce } from "react-use"
 
+import { ERRORS_TOAST, SUCCESS_TOAST } from "@/lib/error"
 import { useToast } from "@/components/ui/use-toast"
 
 interface MqttObject {
@@ -18,7 +19,7 @@ interface MqttObject {
 type SetClientFunction = (client: MqttObject | null) => void
 
 type MqttContextType = {
-  client?: MqttObject | null
+  client?: MqttObject | undefined | null
   setClient?: SetClientFunction | undefined | null
 }
 
@@ -35,19 +36,12 @@ export const MqttProvider = ({ children }: BaseLayoutProps) => {
 
   useEffectOnce(() => {
     connectionToMqtt(setClient)
-    toast({
-      variant: "success",
-      title: "Vous etes connectez.",
-      description: "T'es un gigabogoss",
-    })
+    toast(SUCCESS_TOAST.login)
+
     return () => {
       if (client) {
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem with your request.",
-        })
-        client?.end()
+        toast(ERRORS_TOAST.timeout)
+        client.end()
       }
     }
   })
@@ -58,5 +52,3 @@ export const MqttProvider = ({ children }: BaseLayoutProps) => {
     </Context.Provider>
   )
 }
-
-export const useMqtt = () => useContext(Context)
