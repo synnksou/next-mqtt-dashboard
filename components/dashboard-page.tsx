@@ -1,25 +1,54 @@
 /* eslint-disable tailwindcss/classnames-order */
 /* eslint-disable react/no-unescaped-entities */
-import { AirVentIcon, DollarSign, Thermometer, User, Wind } from "lucide-react"
+
+import { useState } from "react"
+import { useMqtt } from "@/context/MqttProvider"
+import { Thermometer, User, Wind } from "lucide-react"
+import { useDeepCompareEffect, useEffectOnce } from "react-use"
 
 import { DashboardItem } from "@/types/index"
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { TabsContent } from "./ui/tabs"
 
-const DashboardPage = ({
-  celcius,
-  airQuality,
-  countPerson,
-  index,
-  value,
-}: DashboardItem) => {
+const LIMIT_PER_ROOM = 200
+
+const DashboardPage = ({ value }: DashboardItem) => {
+  const [airQuality, setAirQuality] = useState<number | null>()
+  const [celcius, setCelcius] = useState<number | null>()
+  const [countPerson, setCountPerson] = useState<number | null>()
+  const { client } = useMqtt()
+
+  useDeepCompareEffect(() => {
+    const handleMqttMessage = (topic: string, message: string) => {
+      console.log("handle", topic, message)
+      if (topic === `${value}/CO2`) {
+        setAirQuality(parseFloat(message))
+      } else if (topic === `${value}/temperature`) {
+        setCelcius(parseFloat(message))
+      } else if (topic === `${value}/number_of_people`) {
+        setCountPerson(parseInt(message))
+      }
+    }
+
+    if (client) {
+      console.log("subscribe")
+      client.subscribe(`#`)
+      client.subscribe(`${value}/CO2`)
+      client.subscribe(`${value}/temperature`)
+      client.subscribe(`${value}/number_of_people`)
+      client.publish("room_1/temperature", "12")
+
+      client.on("message", handleMqttMessage)
+    }
+
+    return () => {
+      if (client) {
+        client.off("message", handleMqttMessage)
+      }
+    }
+  }, [{ client, value }])
+
   return (
     <TabsContent value={value} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -31,7 +60,7 @@ const DashboardPage = ({
             <Wind className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{airQuality}</div>
+            <div className="text-2xl font-bold">{airQuality || "No data"}</div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
             </p>
@@ -44,7 +73,7 @@ const DashboardPage = ({
             <Thermometer className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{celcius}</div>
+            <div className="text-2xl font-bold">{celcius || "No data"} </div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
             </p>
@@ -58,7 +87,9 @@ const DashboardPage = ({
             <User className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+{countPerson}</div>
+            <div className="text-2xl font-bold">
+              {countPerson || "No data"} / {LIMIT_PER_ROOM}
+            </div>
             <p className="text-xs text-muted-foreground">
               +19% from last month
             </p>

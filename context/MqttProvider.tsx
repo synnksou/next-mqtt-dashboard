@@ -9,6 +9,7 @@ import { ERRORS_TOAST, SUCCESS_TOAST } from "@/lib/error"
 import { useToast } from "@/components/ui/use-toast"
 
 interface MqttObject {
+  off(arg0: string, callback: (topic: any, message: any) => void): unknown
   on: (event: string, callback: (...args: any[]) => void) => void
   end: () => void
   subscribe: (topic: string) => void
@@ -35,8 +36,7 @@ export const MqttProvider = ({ children }: BaseLayoutProps) => {
   const { toast } = useToast()
 
   useEffectOnce(() => {
-    connectionToMqtt(setClient)
-    toast(SUCCESS_TOAST.login)
+    connectionToMqtt(setClient, toast)
 
     return () => {
       if (client) {
@@ -51,4 +51,14 @@ export const MqttProvider = ({ children }: BaseLayoutProps) => {
       {children}
     </Context.Provider>
   )
+}
+
+export const useMqtt = () => {
+  const context = useContext(Context)
+
+  if (context === undefined) {
+    throw new Error("useMqtt must be used within a MqttProvider")
+  }
+
+  return context
 }

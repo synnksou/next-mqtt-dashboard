@@ -7,16 +7,13 @@ import { Tabs, TabsList, TabsTrigger } from "./ui/tabs"
 
 const FAKE_DATA = [
   {
-    celcius: 23,
-    airQuality: 12,
-    countPerson: 2,
-    tabName: "overview",
+    tabName: "room_1",
   },
   {
-    celcius: 17,
-    airQuality: 32,
-    countPerson: 23,
-    tabName: "gogo gros noob",
+    tabName: "room_2",
+  },
+  {
+    tabName: "room_3",
   },
 ]
 
@@ -24,7 +21,7 @@ const Dashboard = () => {
   const data = FAKE_DATA ?? []
 
   return (
-    <Tabs defaultValue="overview" className="space-y-4">
+    <Tabs defaultValue={FAKE_DATA[0].tabName} className="space-y-4">
       <TabsList>
         {data?.map(({ tabName }) => (
           <TabsTrigger
@@ -36,15 +33,8 @@ const Dashboard = () => {
           </TabsTrigger>
         ))}
       </TabsList>
-      {data?.map(({ celcius, airQuality, countPerson, tabName }, index) => (
-        <DashboardPage
-          key={index}
-          celcius={celcius}
-          airQuality={airQuality}
-          countPerson={countPerson}
-          index={index}
-          value={tabName}
-        />
+      {data?.map(({ tabName }, index) => (
+        <DashboardPage key={index} value={tabName} />
       ))}
     </Tabs>
   )
