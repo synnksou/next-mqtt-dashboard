@@ -1,13 +1,14 @@
 /* eslint-disable tailwindcss/classnames-order */
 /* eslint-disable react/no-unescaped-entities */
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { useMqtt } from "@/context/MqttProvider"
 import { Thermometer, User, Wind } from "lucide-react"
 import { useDeepCompareEffect, useEffectOnce } from "react-use"
 
 import { DashboardItem } from "@/types/index"
 
+import Graph from "./graph"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { TabsContent } from "./ui/tabs"
 
@@ -19,18 +20,26 @@ const DashboardPage = ({ value }: DashboardItem) => {
   const [countPerson, setCountPerson] = useState<number | null>()
   const { client } = useMqtt()
 
-  useDeepCompareEffect(() => {
-    const handleMqttMessage = (topic: string, message: string) => {
-      console.log("handle", topic, message)
-      if (topic === `${value}/CO2`) {
-        setAirQuality(parseFloat(message))
-      } else if (topic === `${value}/temperature`) {
-        setCelcius(parseFloat(message))
-      } else if (topic === `${value}/number_of_people`) {
-        setCountPerson(parseInt(message))
+  const handleMqttMessage = useCallback(
+    (topic: string, message: string) => {
+      switch (topic) {
+        case `${value}/CO2`:
+          setAirQuality(parseFloat(message))
+          break
+        case `${value}/temperature`:
+          setCelcius(parseFloat(message))
+          break
+        case `${value}/number_of_people`:
+          setCountPerson(parseInt(message))
+          break
+        default:
+          break
       }
-    }
+    },
+    [value]
+  )
 
+  useDeepCompareEffect(() => {
     if (client) {
       console.log("subscribe")
       client.subscribe(`#`)
@@ -47,7 +56,7 @@ const DashboardPage = ({ value }: DashboardItem) => {
         client.off("message", handleMqttMessage)
       }
     }
-  }, [{ client, value }])
+  }, [client, handleMqttMessage, value])
 
   return (
     <TabsContent value={value} className="space-y-4">
@@ -95,38 +104,17 @@ const DashboardPage = ({ value }: DashboardItem) => {
             </p>
           </CardContent>
         </Card>
-        {/*  <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-                                <Activity className="w-4 h-4 text-muted-foreground" />
-            
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">
-              +201 since last hour
-            </p>
-          </CardContent>
-        </Card> */}
       </div>
-      {/*    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+      <div className="grid gap-4 md:grid-cols-8 lg:grid-cols-8">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Overview</CardTitle>
+            <CardTitle>Stats</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-                                <Overview />
-            
+            <Graph />
           </CardContent>
         </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
-            <CardDescription>You made 265 sales this month.</CardDescription>
-          </CardHeader>
-          <CardContent><RecentSales /> </CardContent>
-        </Card>
-      </div> */}
+      </div>
     </TabsContent>
   )
 }

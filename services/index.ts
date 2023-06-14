@@ -9,6 +9,7 @@ export const connectionToMqtt = async (
   try {
     //
     const clientId = "mqttjs_" + Math.random().toString(16).substr(2, 8)
+    /*
     const mqttClient = mqtt.connect(
       "wss://3dbd3ae102d847199a686471afce2949.s1.eu.hivemq.cloud:8884/mqtt",
       {
@@ -29,8 +30,9 @@ export const connectionToMqtt = async (
         rejectUnauthorized: false,
       }
     )
+    */
 
-    /*  const mqttClient = mqtt.connect(
+    const mqttClient = mqtt.connect(
       "wss://3b5b91ea152d4e57ad9b34c41c75307a.s1.eu.hivemq.cloud:8884/mqtt",
       {
         username: "efficomAntoineMqtt",
@@ -49,7 +51,7 @@ export const connectionToMqtt = async (
         },
         rejectUnauthorized: false,
       }
-    ) */
+    )
 
     mqttClient.on("connect", () => {
       toast(SUCCESS_TOAST.login)
