@@ -32,8 +32,6 @@ const DashboardPage = ({ value }: DashboardItem) => {
 
   const { client } = useMqtt()
 
-  console.log({ airQuality, celcius, countPerson })
-
   const handleMqttMessage = useCallback(
     (topic: string, message: string) => {
       switch (topic) {
@@ -55,7 +53,6 @@ const DashboardPage = ({ value }: DashboardItem) => {
 
   useDeepCompareEffect(() => {
     if (client) {
-      console.log("subscribe")
       client.subscribe(`#`)
       client.subscribe(`${value}/CO2`)
       client.subscribe(`${value}/temperature`)
@@ -69,7 +66,7 @@ const DashboardPage = ({ value }: DashboardItem) => {
         client.off("message", handleMqttMessage)
       }
     }
-  }, [client, handleMqttMessage, value])
+  }, [{ client, handleMqttMessage, value }])
 
   useDeepCompareEffect(() => {
     if (graphData.length > 10) {
@@ -94,8 +91,6 @@ const DashboardPage = ({ value }: DashboardItem) => {
         },
       ])
     }
-
-    console.log({ airQuality, celcius, countPerson })
   }, [airQuality, celcius, countPerson])
 
   return (

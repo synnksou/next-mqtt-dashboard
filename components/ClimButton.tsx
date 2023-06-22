@@ -10,16 +10,24 @@ const ClimButton = ({ value }: { value: string }) => {
   useEffect(() => {
     if (!client) return
 
-    client.subscribe(`${value}/clim`)
+    const climTopic = `${value}/clim`
 
-    client.on("message", (topic, message) => {
-      if (topic === `${value}/clim`) {
+    const handleMqttMessage = (
+      topic: string,
+      message: { toString: () => string }
+    ) => {
+      if (topic === climTopic) {
+        console.log("topic", topic, "message", message.toString())
         setIsClimOn(message.toString() === "on")
       }
-    })
+    }
+
+    client.subscribe(climTopic)
+    client.on("message", handleMqttMessage)
 
     return () => {
-      client.unsubscribe(`${value}/clim`)
+      client.unsubscribe(climTopic)
+      client.off("message", handleMqttMessage)
     }
   }, [client, value])
 
@@ -28,7 +36,9 @@ const ClimButton = ({ value }: { value: string }) => {
     const message = isClimOn ? "off" : "on"
 
     if (!client) return console.log("no client")
+    console.log("publish", `${value}/clim`, message)
     client.publish(`${value}/clim`, message, { retain: true })
+    // CE QUE TU RECOI C'EST SURMENT UN OBJET QUI EST DEJA LA AVEC LE RETAIN IL FAUT QUE TU REMETE  OFF QUAND TU RESET
   }
 
   return (
