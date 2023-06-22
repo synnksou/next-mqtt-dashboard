@@ -6,8 +6,6 @@ import { useMqtt } from "@/context/MqttProvider"
 import { Thermometer, User, Wind } from "lucide-react"
 import { useDeepCompareEffect, useEffectOnce } from "react-use"
 import {
-  Bar,
-  BarChart,
   CartesianGrid,
   Legend,
   Line,
@@ -21,7 +19,6 @@ import {
 import { DashboardItem, GraphData } from "@/types/index"
 
 import ClimButton from "./ClimButton"
-import Graph from "./graph"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { TabsContent } from "./ui/tabs"
 
@@ -55,8 +52,6 @@ const DashboardPage = ({ value }: DashboardItem) => {
     },
     [value]
   )
-
-  console.log({ graphData })
 
   useDeepCompareEffect(() => {
     if (client) {
