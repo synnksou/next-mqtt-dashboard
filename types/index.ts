@@ -7,3 +7,9 @@ export interface DashboardItem {
 export interface BaseLayoutProps {
   children?: ReactNode
 }
+
+export interface GraphData {
+  name: string
+  airQuality?: number
+  celcius?: number
+}
