@@ -1,5 +1,6 @@
 "use client"
 
+import { GraphData } from "@/types"
 import {
   Bar,
   BarChart,
@@ -135,13 +136,13 @@ const Graph = () => {
 }
 
 */
-const Graph = () => {
+const Graph = (graphData: any) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
         width={500}
         height={300}
-        data={data}
+        data={graphData}
         margin={{
           top: 5,
           right: 30,

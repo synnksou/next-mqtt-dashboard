@@ -5,9 +5,22 @@ import { useCallback, useState } from "react"
 import { useMqtt } from "@/context/MqttProvider"
 import { Thermometer, User, Wind } from "lucide-react"
 import { useDeepCompareEffect, useEffectOnce } from "react-use"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 
-import { DashboardItem } from "@/types/index"
+import { DashboardItem, GraphData } from "@/types/index"
 
+import ClimButton from "./ClimButton"
 import Graph from "./graph"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { TabsContent } from "./ui/tabs"
@@ -18,7 +31,11 @@ const DashboardPage = ({ value }: DashboardItem) => {
   const [airQuality, setAirQuality] = useState<number | null>()
   const [celcius, setCelcius] = useState<number | null>()
   const [countPerson, setCountPerson] = useState<number | null>()
+  const [graphData, setGraphData] = useState<GraphData[]>([])
+
   const { client } = useMqtt()
+
+  console.log({ airQuality, celcius, countPerson })
 
   const handleMqttMessage = useCallback(
     (topic: string, message: string) => {
@@ -39,6 +56,8 @@ const DashboardPage = ({ value }: DashboardItem) => {
     [value]
   )
 
+  console.log({ graphData })
+
   useDeepCompareEffect(() => {
     if (client) {
       console.log("subscribe")
@@ -47,7 +66,6 @@ const DashboardPage = ({ value }: DashboardItem) => {
       client.subscribe(`${value}/temperature`)
       client.subscribe(`${value}/number_of_people`)
       client.publish("room_1/temperature", "12")
-
       client.on("message", handleMqttMessage)
     }
 
@@ -57,6 +75,33 @@ const DashboardPage = ({ value }: DashboardItem) => {
       }
     }
   }, [client, handleMqttMessage, value])
+
+  useDeepCompareEffect(() => {
+    if (graphData.length > 10) {
+      setGraphData((prev) => prev.slice(1))
+      setGraphData((prevData) => [
+        ...prevData,
+        {
+          name: new Date().toLocaleTimeString(),
+          airQuality: airQuality || 0,
+          celcius: celcius || 0,
+          countPerson: countPerson || 0,
+        },
+      ])
+    } else {
+      setGraphData((prevData) => [
+        ...prevData,
+        {
+          name: new Date().toLocaleTimeString(),
+          airQuality: airQuality || 0,
+          celcius: celcius || 0,
+          countPerson: countPerson || 0,
+        },
+      ])
+    }
+
+    console.log({ airQuality, celcius, countPerson })
+  }, [airQuality, celcius, countPerson])
 
   return (
     <TabsContent value={value} className="space-y-4">
@@ -70,24 +115,19 @@ const DashboardPage = ({ value }: DashboardItem) => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{airQuality || "No data"}</div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className={celcius && celcius > 30 ? "bg-red-500" : ""}>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Température</CardTitle>
-
             <Thermometer className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{celcius || "No data"} </div>
-            <p className="text-xs text-muted-foreground">
-              +20.1% from last month
-            </p>
+            <div className="text-2xl font-bold">{celcius || "No data"}</div>
+            <ClimButton value={value} />
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">
@@ -99,19 +139,27 @@ const DashboardPage = ({ value }: DashboardItem) => {
             <div className="text-2xl font-bold">
               {countPerson || "No data"} / {LIMIT_PER_ROOM}
             </div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
           </CardContent>
         </Card>
       </div>
       <div className="grid gap-4 md:grid-cols-8 lg:grid-cols-8">
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Stats</CardTitle>
+            <CardTitle>Degres / Nombre de personne</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            <Graph />
+            <ResponsiveContainer width={600} height={400}>
+              <LineChart data={graphData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+
+                <Line type="monotone" dataKey="celcius" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="countPerson" stroke="#ffc658" />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
