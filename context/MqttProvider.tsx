@@ -13,7 +13,8 @@ interface MqttObject {
   on: (event: string, callback: (...args: any[]) => void) => void
   end: () => void
   subscribe: (topic: string) => void
-  publish: (topic: string, message: string) => void
+  unsubscribe: (topic: string) => void
+  publish: (topic: string, message: string, options?: any) => void
   connect: () => void
 }
 

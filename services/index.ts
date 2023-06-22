@@ -7,7 +7,6 @@ export const connectionToMqtt = async (
   toast: Function
 ) => {
   try {
-    //
     const clientId = "mqttjs_" + Math.random().toString(16).substr(2, 8)
 
     const mqttClient = mqtt.connect(
@@ -30,29 +29,6 @@ export const connectionToMqtt = async (
         rejectUnauthorized: false,
       }
     )
-
-    /*
-    const mqttClient = mqtt.connect(
-      "wss://3b5b91ea152d4e57ad9b34c41c75307a.s1.eu.hivemq.cloud:8884/mqtt",
-      {
-        username: "efficomAntoineMqtt",
-        password: "Password59@",
-        clientId,
-        protocolId: "MQTT",
-        protocolVersion: 4,
-        clean: true,
-        reconnectPeriod: 1000,
-        connectTimeout: 30 * 1000,
-        will: {
-          topic: "WillMsg",
-          payload: "Connection Closed abnormally..!",
-          qos: 0,
-          retain: false,
-        },
-        rejectUnauthorized: false,
-      }
-    )
-    */
 
     mqttClient.on("connect", () => {
       toast(SUCCESS_TOAST.login)
