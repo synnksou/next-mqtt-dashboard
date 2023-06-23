@@ -36,7 +36,7 @@ Ce projet utilise les bibliothèques suivantes :
 1. Clonez ce dépôt :
 
 ```bash
-git clone https://github.com/username/repository.git
+git clone https://github.com/synnksou/next-mqtt-dashboard
 ```
 
 2. Naviguez vers le dossier du projet :
