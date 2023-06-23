@@ -42,7 +42,7 @@ git clone https://github.com/synnksou/next-mqtt-dashboard
 2. Naviguez vers le dossier du projet :
 
 ```bash
-cd repository
+cd next-mqtt-dashboard
 ```
 
 3. Installez les dépendances :
