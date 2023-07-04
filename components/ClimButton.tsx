@@ -7,6 +7,7 @@ const ClimButton = ({ value }: { value: string }) => {
   const { client } = useMqtt()
   const [isClimOn, setIsClimOn] = useState(false)
 
+  console.log({ client })
   useEffect(() => {
     if (!client) return
 
